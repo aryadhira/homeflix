@@ -1,0 +1,8 @@
+server: "localhost"
+port: "9090"
+db: ""
+dbserver: "127.0.0.1"
+dbport: "27017"
+download: "C:/Users/aryadhira/Documents/Movie"
+peerflixpath: "C:/Users/aryadhira/AppData/Roaming/npm/node_modules/peerflix/app.js"
+ytsurl: "https://yts.torrentbay.to/api/v2/list_movies.json"
