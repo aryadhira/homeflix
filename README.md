@@ -5,8 +5,9 @@ streaming and download movie from YTS using golang collaboration with amazing no
 1. install mongodb for the database movie
 2. install peerflix from https://github.com/mafintosh/peerflix
 3. install vlc as a default player
-4. update movie database first
-5. choose movie and enjoy stream (currently still only on console, UI still on progress)
+4. create database on mongodb name it "homeflix"
+5. update movie database first
+6. choose movie and enjoy stream (currently still only on console, UI still on progress)
 
 # Credits
 1. YTS as a free torrent movie source (https://yts.mx/)
