@@ -1,7 +1,7 @@
 package main
 
 import (
-	"homeflix/engine"
+	"homeflix/services"
 )
 
 func main() {
@@ -11,6 +11,8 @@ func main() {
 	// 	log.Println(err.Error())
 	// }
 	// log.Println("Data Movie Saved")
-	testengine := new(engine.TestEngine)
-	testengine.GetMovieList()
+	// testengine := new(engine.TestEngine)
+	// testengine.GetMovieList()
+	services := services.FlixService{}
+	services.RunService()
 }
