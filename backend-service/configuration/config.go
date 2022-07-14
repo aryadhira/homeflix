@@ -17,6 +17,7 @@ type Config struct {
 	PeerflixPath   string `yaml:"peerflixpath"`
 	YtsAPIURL      string `yaml:"ytsurl"`
 	Limit          string `yaml:"limit"`
+	Page           string `yaml:"page"`
 }
 
 func (c *Config) GetConfig() *Config {

@@ -1,4 +1,6 @@
 <template>
+<div>
+    <Loading v-if="isProcessing"/>
     <div class="homeflix">
         <img src="../assets/img/background.jpg" alt="">
         <div class="text-container">
@@ -6,15 +8,33 @@
                 <span class="mini-heading">Homeflix</span>
                 <h1><span>Home</span>Flix</h1>
                 <a href="#movie-grid" class="button">View Movies</a>
-                <button class="button">Update Collection</button>
+                <button class="button" @click="UpdateCollection">Update Collection</button>
             </div>
         </div>
     </div>
+</div>
+    
 </template>
 
 <script>
+import axios from 'axios'
     export default{
         name:"homeflix",
+        data(){
+            return{
+                isProcessing:false
+            }
+        },
+        methods : {
+            UpdateCollection (){
+                this.isProcessing = true
+                const data = axios.get('http://localhost:9090/updatemovie')
+                setTimeout(function(){
+                    this.isProcessing = false
+                    location.reload()
+                },5000)
+            },
+        }
     }
 </script>
 

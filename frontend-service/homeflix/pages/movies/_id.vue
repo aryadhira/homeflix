@@ -20,9 +20,16 @@
                 <p class="movie-fact tagline"><span>Synopsis : </span>{{movie.synopsis}}</p>
                 <p class="movie-fact"><span>Play Now : </span>
                     <span v-for="(torrent,index) in movie.torrents" :key="index">
-                        <button class="button">{{torrent.type}} {{torrent.quality}}</button>
+                        <button class="button" @click="showModal = true">{{torrent.type}} {{torrent.quality}}</button>
                     </span>
                 </p>
+            </div>
+        </div>
+        <div id="modal" v-if="showModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close" @click="showModal = false">&times;</span>
+                <p>Some text in the Modal..</p>
             </div>
         </div>
     </div>
@@ -36,6 +43,7 @@ export default {
     data() {
         return {
             movie: null,
+            showModal: false,
         };
     },
     async fetch() {
@@ -49,7 +57,7 @@ export default {
             const data = axios.get(url);
             const result = await data;
             this.movie = result.data.Data;
-        }
+        },
     },
     components: { Loading }
 }
@@ -116,4 +124,48 @@ export default {
         }
     }
 }
+
+.modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+
+    p{
+        color: #000;
+    }
+
+  /* Modal Content */
+    .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    }
+
+/* The Close Button */
+    .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    }
+}
+
+
 </style>

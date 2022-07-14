@@ -8,22 +8,24 @@ import (
 	"homeflix/models"
 	"log"
 	"net/http"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 type MovieEngine struct{}
 
-func (me *MovieEngine) GetMovieData() (models.ApiResult, error) {
+func (me *MovieEngine) GetMovieData(page int) (models.ApiResult, error) {
 	log.Println("Getting Movie Data From YTS...")
 
 	cfg := new(configuration.Config)
 	config := cfg.GetConfig()
 	limit := config.Limit
+	pagenum := strconv.Itoa(page)
 
 	var err error
 	var client = &http.Client{}
-	var apiurl = config.YtsAPIURL + "?limit=" + limit + "&page=1&sort_by=year&order_by=desc"
+	var apiurl = config.YtsAPIURL + "?limit=" + limit + "&page=" + pagenum + "&sort_by=year&order_by=desc"
 	results := models.ApiResult{}
 
 	request, err := http.NewRequest("GET", apiurl, nil)
@@ -46,9 +48,9 @@ func (me *MovieEngine) GetMovieData() (models.ApiResult, error) {
 	return results, err
 }
 
-func (me *MovieEngine) SaveMovieData() error {
+func (me *MovieEngine) SaveMovieData(pagenum int) error {
 	//Grab Movie Data
-	ytsres, err := me.GetMovieData()
+	ytsres, err := me.GetMovieData(pagenum)
 	moviedata := []models.Movie{}
 	if err != nil {
 		return err
@@ -113,4 +115,21 @@ func (me *MovieEngine) IsMovieExist(moviemap map[string]string, title string) bo
 		isExist = true
 	}
 	return isExist
+}
+
+func (me *MovieEngine) UpdateMovieCollection() error {
+	cfg := new(configuration.Config)
+	config := cfg.GetConfig()
+	page := config.Page
+
+	pagetotal, _ := strconv.Atoi(page)
+
+	for i := 0; i < pagetotal; i++ {
+		err := me.SaveMovieData(i + 1)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

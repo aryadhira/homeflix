@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"homeflix/engine"
 	"homeflix/helper"
 	. "homeflix/models"
 	"log"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type FlixService struct{}
@@ -22,6 +24,7 @@ func (fs *FlixService) RunService() {
 
 	router.GET("/getmovies", fs.GetMovieData)
 	router.GET("/getmoviebyid/:id", fs.GetMovieById)
+	router.GET("/updatemovie", fs.UpdateCollection)
 	router.Run("localhost:9090")
 }
 
@@ -39,8 +42,8 @@ func (fs *FlixService) GetMovieData(c *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 	}
-
-	csr, err := db.Collection("movies").Find(ctx, bson.M{})
+	opts := options.Find().SetSort(bson.M{"dateuploaded": -1})
+	csr, err := db.Collection("movies").Find(ctx, bson.M{}, opts)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -90,4 +93,18 @@ func (fs *FlixService) GetMovieById(c *gin.Context) {
 	res := helper.SetHttpResponse("", results)
 
 	c.JSON(http.StatusOK, res)
+}
+
+func (fs *FlixService) UpdateCollection(c *gin.Context) {
+	res := "Update Data Success"
+
+	grabber := new(engine.MovieEngine)
+	err := grabber.UpdateMovieCollection()
+	if err != nil {
+		res = err.Error()
+	}
+
+	result := helper.SetHttpResponse(res, nil)
+
+	c.JSON(http.StatusOK, result)
 }

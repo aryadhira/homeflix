@@ -1,6 +1,7 @@
 <template>
     <div class="loading">
         <span></span>
+        <h1>Please Wait...</h1>
     </div>
 </template>
 
@@ -13,8 +14,10 @@ export default{}
     height: 100vh;
     width: 100%;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 
     @keyframes circle-loading {
         to {
@@ -30,6 +33,10 @@ export default{}
         border: 2px solid transparent;
         border-top-color: #fff;
         animation: circle-loading 1200ms ease infinite;
+    }
+
+    h1 {
+        color: #fff;
     }
 }
 </style>
