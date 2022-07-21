@@ -20,16 +20,25 @@
                 <p class="movie-fact tagline"><span>Synopsis : </span>{{movie.synopsis}}</p>
                 <p class="movie-fact"><span>Play Now : </span>
                     <span v-for="(torrent,index) in movie.torrents" :key="index">
-                        <button class="button" @click="showModal = true">{{torrent.type}} {{torrent.quality}}</button>
+                        <button class="button" @click="popModal(torrent.type,torrent.quality)">{{torrent.type}} {{torrent.quality}}</button>
                     </span>
                 </p>
             </div>
         </div>
-        <div id="modal" v-if="showModal" class="modal">
+        <div v-if="showModal" class="modal">
             <!-- Modal content -->
             <div class="modal-content">
-                <span class="close" @click="showModal = false">&times;</span>
-                <p>Some text in the Modal..</p>
+                <div class="modal-header">
+                    <span class="close" @click="showModal = false">&times;</span>
+                    <h1>{{movie.title}} {{type}} {{quality}}</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Some text in the Modal..</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="button" @click="showModal = false">Close</button>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -38,12 +47,15 @@
 <script>
 import axios from 'axios'
 import Loading from '../../components/loading.vue'
+const WebTorrent = require('webtorrent')
 export default {
     name: "single-movie",
     data() {
         return {
             movie: null,
             showModal: false,
+            quality: "",
+            type: "",
         };
     },
     async fetch() {
@@ -57,6 +69,51 @@ export default {
             const data = axios.get(url);
             const result = await data;
             this.movie = result.data.Data;
+        },
+        async popModal(type,quality) {
+            this.showModal = true
+            this.quality = quality
+            this.type = type
+            let hash = this.getHash()
+            console.log("hash",hash,this.movie.title_long,this.quality)
+
+            const url = "http://localhost:9090/getmagneturl?title="+this.movie.title_long+"&qlty="+this.quality+"&hash="+hash
+
+            const data = axios.post(url)
+            const res = await data
+            const magneturl = res.data.magnet
+            console.log(res.data.magnet)
+
+            this.streamMovie(magneturl)
+        },
+        getHash() {
+            let torrents = this.movie.torrents
+            let hash = ""
+            for (var i=0; i<torrents.length; i++) {
+                if (torrents[i].type == this.type && torrents[i].quality == this.quality){
+                    hash = torrents[i].hash
+                }
+            }
+            return hash
+        },
+        streamMovie(magnet) {
+            const client = new WebTorrent()
+
+            client.on('error',function(err){
+                console.log(err.message)
+            })
+
+            console.log("adding torrent")
+            client.add(magnet,this.onTorrent)
+
+        },
+        onTorrent(torrent){
+            console.log(torrent.name)
+            console.log(torrent.magnetURI)
+            const file = torrent.files.find(function (file) {
+                return file.name.endsWith('.mp4')
+            })
+            file.appendTo('.modal-body')
         },
     },
     components: { Loading }
@@ -126,10 +183,9 @@ export default {
 }
 
 .modal {
-  display: block; /* Hidden by default */
+  display: flex; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -137,26 +193,33 @@ export default {
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  color: #fff;
 
-    p{
-        color: #000;
-    }
-
-  /* Modal Content */
     .modal-content {
-    background-color: #fefefe;
+    background-color: #0f0606;
     margin: auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+    border: 1px solid rgb(12, 10, 10);
+    width: 90%;
+
+        .modal-header {
+            padding-bottom: 20px;
+        }
+        .modal-body {
+            height: 600px;
+            padding-bottom: 20px;
+        }
+        .modal-footer {
+            display: flex;
+            flex-direction: row-reverse;
+        }
     }
 
-/* The Close Button */
     .close {
     color: #aaaaaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
+    float: right;
     }
 
     .close:hover,

@@ -35,7 +35,7 @@ func GenerateEncodedTrackerUrl() string {
 
 	}
 	// use tracker for webtorrent
-	strreturn = "&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com"
+	// strreturn = "&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com"
 
 	return strreturn
 }
@@ -63,4 +63,13 @@ func GetTorrentByQuality(torrents []models.Torrent, _type string, _qlty string) 
 		}
 	}
 	return idx
+}
+
+func GenerateMagnetUrl(title_long string, hash string, _qlty string) string {
+	urltoencode := title_long + " [" + _qlty + "] " + "[YTS.MX]"
+	encodedurl := EncodeUrl(urltoencode)
+	trackerurl := GenerateEncodedTrackerUrl()
+	magneturl := "magnet:?xt=urn:btih:" + hash + "&dn=" + encodedurl + trackerurl
+
+	return magneturl
 }

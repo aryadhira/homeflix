@@ -25,6 +25,7 @@ func (fs *FlixService) RunService() {
 	router.GET("/getmovies", fs.GetMovieData)
 	router.GET("/getmoviebyid/:id", fs.GetMovieById)
 	router.GET("/updatemovie", fs.UpdateCollection)
+	router.POST("/getmagneturl", fs.GetMagnetUrl)
 	router.Run("localhost:9090")
 }
 
@@ -107,4 +108,22 @@ func (fs *FlixService) UpdateCollection(c *gin.Context) {
 	result := helper.SetHttpResponse(res, nil)
 
 	c.JSON(http.StatusOK, result)
+}
+
+func (fs *FlixService) GetMagnetUrl(c *gin.Context) {
+
+	title := c.Query("title")
+	quality := c.Query("qlty")
+	hash := c.Query("hash")
+
+	res := make(map[string]string, 0)
+
+	if title != "" && quality != "" && hash != "" {
+		magneturl := helper.GenerateMagnetUrl(title, hash, quality)
+		res["magnet"] = magneturl
+		streamer := new(engine.StreamerEngine)
+		streamer.StartStreaming(magneturl)
+	}
+
+	c.JSON(http.StatusOK, res)
 }
